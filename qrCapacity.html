@@ -50,6 +50,19 @@
         const waterLevelSpan = document.getElementById('waterLevel');
         const waterInput = document.getElementById('waterInput');
 
+        const url = "https://make.powerautomate.com/environments/8523f864-15d2-e78e-a18e-873d21ce04d3/flows/18000203-1380-40be-b865-071a9aa3f211/runs/08584695021324703627485165590CU26?v3=falsehttps://make.powerautomate.com/environments/8523f864-15d2-e78e-a18e-873d21ce04d3/flows/18000203-1380-40be-b865-071a9aa3f211?v3=false";
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    filter: "latest"
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+
         // Update water level based on input value
         waterInput.addEventListener('input', () => {
             const value = waterInput.value;
