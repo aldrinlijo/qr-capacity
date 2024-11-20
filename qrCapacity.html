@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tank</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .tank-container {
+            position: relative;
+            width: 150px;
+            height: 300px;
+            border: 5px solid #000;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #e0e0e0;
+        }
+        .water {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #3498db;
+            transition: height 0.5s ease;
+        }
+        .label {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tank-container">
+        <div class="water" id="water"></div>
+    </div>
+    <div class="label">
+        Water Level: <span id="waterLevel">0</span>%
+    </div>
+    <input type="range" id="waterInput" min="0" max="100" value="0" style="margin-top: 20px;">
+    <script>
+        const waterElement = document.getElementById('water');
+        const waterLevelSpan = document.getElementById('waterLevel');
+        const waterInput = document.getElementById('waterInput');
+
+        // Update water level based on input value
+        waterInput.addEventListener('input', () => {
+            const value = waterInput.value;
+            waterLevelSpan.textContent = value;
+            waterElement.style.height = `${value}%`;
+        });
+    </script>
+</body>
+</html>
