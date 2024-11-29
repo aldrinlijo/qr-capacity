@@ -1,39 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retrieve D365 Record</title>
-  <script>
-    async function fetchD365Record() {
-      const flowUrl = "https://prod-31.centralindia.logic.azure.com:443/workflows/b80fa14b8c064879a04bc1bac083be1a/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9TC1jN2XKWM1wxjuwo3Y3PgWK0NeB0jjfigU2p_kWPY";
-      const headers = {
-        "Content-Type": "application/json",
-        // Add Authorization header if required
-      };
-
-      try {
-        const response = await fetch(flowUrl, {
-          method: "POST",
-          headers: headers,
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          document.getElementById("record-container").textContent = JSON.stringify(data, null, 2);
-        } else {
-          console.error("Failed to fetch record:", response.status, response.statusText);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tank</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-      } catch (error) {
-        console.error("Error fetching record:", error);
-      }
-    }
-
-    window.onload = fetchD365Record;
-  </script>
+        .tank-container {
+            position: relative;
+            width: 150px;
+            height: 300px;
+            border: 5px solid #000;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #e0e0e0;
+        }
+        .water {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #3498db;
+            transition: height 0.5s ease;
+        }
+        .label {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        #record-container {
+            margin-top: 20px;
+            max-width: 400px;
+            word-wrap: break-word;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
-  <h1>Water Level</h1>
-  <pre id="record-container">Loading...</pre>
+    <div class="tank-container">
+        <div class="water" id="water"></div>
+    </div>
+    <div class="label">
+        Water Level: <span id="waterLevel">0</span> Liters
+    </div>
+    <button id="fetchData" style="margin-top: 20px; padding: 10px 15px;">Fetch Tank Level</button>
+
+    <div id="record-container"></div>
+
+    <script>
+        const flowUrl = "https://prod-31.centralindia.logic.azure.com:443/workflows/b80fa14b8c064879a04bc1bac083be1a/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9TC1jN2XKWM1wxjuwo3Y3PgWK0NeB0jjfigU2p_kWPY";
+        const headers = {
+            "Content-Type": "application/json"
+        };
+
+        const waterElement = document.getElementById('water');
+        const waterLevelSpan = document.getElementById('waterLevel');
+        const fetchDataButton = document.getElementById('fetchData');
+        const recordContainer = document.getElementById('record-container');
+
+        const tankCapacity = 1000; // Maximum tank capacity in liters
+
+        async function fetchTankLevel() {
+            try {
+                const response = await fetch(flowUrl, {
+                    method: "POST",
+                    headers: headers,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Display the raw data in the record container
+                    recordContainer.textContent = JSON.stringify(data, null, 2);
+
+                    // Extract the Name value
+                    const nameValue = data.Name; // Update based on your API's response structure
+
+                    if (!nameValue) {
+                        alert("No valid 'Name' value found in the API response.");
+                        return;
+                    }
+
+                    // Convert Name to an integer (assuming it's numeric) and validate it
+                    const tankLevelLiters = parseInt(nameValue, 10);
+                    if (isNaN(tankLevelLiters) || tankLevelLiters < 0 || tankLevelLiters > tankCapacity) {
+                        alert(`Invalid tank level: ${nameValue}`);
+                        return;
+                    }
+
+                    // Calculate the percentage for visualization
+                    const tankLevelPercentage = (tankLevelLiters / tankCapacity) * 100;
+
+                    // Update water level in the UI
+                    waterLevelSpan.textContent = tankLevelLiters;
+                    waterElement.style.height = `${tankLevelPercentage}%`;
+
+                    alert(`Water tank level set to ${tankLevelLiters} Liters.`);
+                } else {
+                    console.error("Failed to fetch record:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Error fetching record:", error);
+            }
+        }
+
+        fetchDataButton.addEventListener('click', fetchTankLevel);
+    </script>
 </body>
 </html>
