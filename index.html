@@ -52,7 +52,6 @@
     <div class="label">
         Water Level: <span id="waterLevel">0</span> Liters
     </div>
-    <button id="fetchData" style="margin-top: 20px; padding: 10px 15px;">Fetch Tank Level</button>
 
     <div id="record-container"></div>
 
@@ -64,7 +63,6 @@
 
         const waterElement = document.getElementById('water');
         const waterLevelSpan = document.getElementById('waterLevel');
-        const fetchDataButton = document.getElementById('fetchData');
         const recordContainer = document.getElementById('record-container');
 
         const tankCapacity = 1000; // Maximum tank capacity in liters
@@ -78,22 +76,15 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    
+
                     // Display the raw data in the record container
                     recordContainer.textContent = JSON.stringify(data, null, 2);
 
-                    // Extract the Name value
-                    const nameValue = data.Name; // Update based on your API's response structure
+                    // Extract the value directly from the API response
+                    const tankLevelLiters = parseInt(data, 10); // Assuming the response is the value
 
-                    if (!nameValue) {
-                        alert("No valid 'Name' value found in the API response.");
-                        return;
-                    }
-
-                    // Convert Name to an integer (assuming it's numeric) and validate it
-                    const tankLevelLiters = parseInt(nameValue, 10);
                     if (isNaN(tankLevelLiters) || tankLevelLiters < 0 || tankLevelLiters > tankCapacity) {
-                        alert(`Invalid tank level: ${nameValue}`);
+                        alert(`Invalid tank level: ${data}`);
                         return;
                     }
 
@@ -104,7 +95,7 @@
                     waterLevelSpan.textContent = tankLevelLiters;
                     waterElement.style.height = `${tankLevelPercentage}%`;
 
-                    alert(`Water tank level set to ${tankLevelLiters} Liters.`);
+                    console.log(`Water tank level set to ${tankLevelLiters} Liters.`);
                 } else {
                     console.error("Failed to fetch record:", response.status, response.statusText);
                 }
@@ -113,7 +104,8 @@
             }
         }
 
-        fetchDataButton.addEventListener('click', fetchTankLevel);
+        // Trigger the fetchTankLevel function when the page loads
+        window.onload = fetchTankLevel;
     </script>
 </body>
 </html>
